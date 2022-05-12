@@ -16,6 +16,8 @@ GLint blueScore = 0;
 GLfloat speedPalets = 0.45;
 GLboolean keystates[256];
 GLboolean collideAlready = 0;
+char strBlue[3] = "0";
+char strRed[3] = "0";
 
 /*Checkeo de colisiones*/
 bool isCollidingPalet1()
@@ -43,12 +45,12 @@ void bounceOnPadle()
     if (!collideAlready && isCollidingPalet1())
     {
         collideAlready = 1;
-        xspeed *= -1;
+        xspeed *= -1.1;
     }
     if (collideAlready && isCollidingPalet2())
     {
         collideAlready = 0;
-        xspeed *= -1;
+        xspeed *= -1.1;
     }
 }
 
@@ -58,22 +60,22 @@ void checkGoals()
     if (redScored())
     {
         redScore++;
+        sprintf(strRed, "%d", redScore);
         x = 0;
         y = 0;
-        xspeed *= -1;
-        yspeed *= -1;
+        xspeed = 0.125;
+        yspeed = 0.125;
         collideAlready = 0;
-        printf("Red score= %d\n", redScore);
     }
     if (blueScored())
     {
         blueScore++;
+        sprintf(strBlue, "%d", blueScore);
         x = 0;
         y = 0;
-        xspeed *= -1;
-        yspeed *= -1;
+        xspeed = -0.125;
+        yspeed = -0.125;
         collideAlready = 1;
-        printf("Blue score= %d\n", blueScore);
     }
 }
 /*Movimiento de las paletas*/
@@ -153,8 +155,12 @@ void display()
 
     glColor3f(1.0, 0.0, 0.0);
     glRectfv(rect1v, rect1v2);
+    glRasterPos2d(5, 0);
+    glutBitmapString(GLUT_BITMAP_9_BY_15, strRed);
     glColor3f(0.0, 0.0, 1.0);
     glRectfv(rect2v, rect2v2);
+    glRasterPos2d(-5, 0);
+    glutBitmapString(GLUT_BITMAP_9_BY_15, strBlue);
     glutSwapBuffers();
     glutPostRedisplay();
 }
@@ -183,6 +189,7 @@ int main(int argc, char **argv)
 
     glutCreateWindow("Pong");
     init();
+
     glutDisplayFunc(display);
     glutKeyboardFunc(checkMov);
     glutReshapeFunc(reshape);
