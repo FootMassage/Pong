@@ -15,15 +15,16 @@ GLint redScore = 0;
 GLint blueScore = 0;
 GLfloat speedPalets = 0.45;
 GLboolean keystates[256];
+GLboolean collideAlready = 0;
 
 /*Checkeo de colisiones*/
 bool isCollidingPalet1()
 {
-    return (x > rect1v[0] - (pointSize / 100) && y > rect1v[1] - (pointSize / 100) && y < rect1v2[1] + (pointSize / 100));
+    return (x > rect1v[0] - (pointSize / 100) && x < rect1v2[0] && y > rect1v[1] - (pointSize / 100) && y < rect1v2[1] + (pointSize / 100));
 }
 bool isCollidingPalet2()
 {
-    return (x < rect2v[0] + (pointSize / 100) && y < rect2v[1] + (pointSize / 100) && y > rect2v2[1] - (pointSize / 100));
+    return (x < rect2v[0] + (pointSize / 100) && x > rect2v2[0] && y < rect2v[1] + (pointSize / 100) && y > rect2v2[1] - (pointSize / 100));
 }
 bool isCollidingWalls()
 {
@@ -39,11 +40,18 @@ bool blueScored()
 }
 void bounceOnPadle()
 {
-    if (isCollidingPalet1() || isCollidingPalet2())
+    if (!collideAlready && isCollidingPalet1())
     {
-        xspeed = -xspeed;
+        collideAlready = 1;
+        xspeed *= -1;
+    }
+    if (collideAlready && isCollidingPalet2())
+    {
+        collideAlready = 0;
+        xspeed *= -1;
     }
 }
+
 /*Checkeo de goles*/
 void checkGoals()
 {
@@ -52,6 +60,9 @@ void checkGoals()
         redScore++;
         x = 0;
         y = 0;
+        xspeed *= -1;
+        yspeed *= -1;
+        collideAlready = 0;
         printf("Red score= %d\n", redScore);
     }
     if (blueScored())
@@ -59,6 +70,9 @@ void checkGoals()
         blueScore++;
         x = 0;
         y = 0;
+        xspeed *= -1;
+        yspeed *= -1;
+        collideAlready = 1;
         printf("Blue score= %d\n", blueScore);
     }
 }
@@ -119,7 +133,7 @@ void display()
     checkGoals();
 
     // draw
-    glPolygonMode(GL_FRONT, GL_LINE);
+    glPolygonMode(GL_FRONT, GL_FILL);
     glLineWidth(2);
     glPointSize(pointSize);
     glColor3f(1.0, 1.0, 1.0);
@@ -129,7 +143,9 @@ void display()
 
     x += xspeed;
     y += yspeed / 2;
+
     bounceOnPadle();
+
     if (isCollidingWalls())
     {
         yspeed = -yspeed;
