@@ -8,3 +8,4 @@ To Execute= ./a.out
 Player 1 = I(UP), K(DOWN)
 
 Player 2 = W(UP), S(DOWN)
+.
