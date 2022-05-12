@@ -8,18 +8,21 @@
 /*Declaracion de variables globales*/
 GLfloat x = 0, y = 0;
 GLfloat rect1v[] = {9, -2}, rect1v2[] = {9.5, 2}, rect2v[] = {-9, 2}, rect2v2[] = {-9.5, -2};
-GLfloat speed = 0.125;
+GLfloat xspeed = 0.125;
+GLfloat yspeed = 0.125;
 GLfloat pointSize = 30.0;
 GLint redScore = 0;
 GLint blueScore = 0;
+GLfloat speedPalets = 0.45;
+GLboolean keystates[256];
 /*Checkeo de colisiones*/
 bool isCollidingPalet1()
 {
-    return (x >= rect1v[0] - (pointSize / 100) && y >= rect1v[1] - (pointSize / 100) && y <= rect1v2[1] + (pointSize / 100));
+    return (x > rect1v[0] - (pointSize / 100) && y > rect1v[1] - (pointSize / 100) && y < rect1v2[1] + (pointSize / 100));
 }
 bool isCollidingPalet2()
 {
-    return (x <= rect2v[0] + (pointSize / 100) && y <= rect2v[1] + (pointSize / 100) && y >= rect2v2[1] - (pointSize / 100));
+    return (x < rect2v[0] + (pointSize / 100) && y < rect2v[1] + (pointSize / 100) && y > rect2v2[1] - (pointSize / 100));
 }
 bool isCollidingWalls()
 {
@@ -52,10 +55,42 @@ void checkGoals()
     }
 }
 /*Movimiento de las paletas*/
-/*void checkMovP1()
+void checkMov(unsigned char key, int x, int y)
 {
+    switch (key)
+    {
+    case 'W':
+    case 'w':
+        rect2v[1] += speedPalets;
+        rect2v2[1] += speedPalets;
+        keystates['w'] = true;
+        keystates['W'] = true;
+        break;
+    case 'S':
+    case 's':
+        rect2v[1] -= speedPalets;
+        rect2v2[1] -= speedPalets;
+        keystates['s'] = true;
+        keystates['S'] = true;
+        break;
+    case 'I':
+    case 'i':
+        rect1v[1] += speedPalets;
+        rect1v2[1] += speedPalets;
+        keystates['i'] = true;
+        keystates['I'] = true;
+        break;
+    case 'K':
+    case 'k':
+        rect1v[1] -= speedPalets;
+        rect1v2[1] -= speedPalets;
+        keystates['k'] = true;
+        keystates['K'] = true;
+    default:
+        break;
+    }
+}
 
-}*/
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -71,11 +106,15 @@ void display()
     glVertex2f(x, y);
     glEnd();
 
-    x += speed;
-    y += speed / 2;
-    if (isCollidingPalet1() || isCollidingPalet2() || isCollidingWalls())
+    x += xspeed;
+    y += yspeed / 2;
+    if (isCollidingPalet1() || isCollidingPalet2())
     {
-        speed = -speed;
+        xspeed = -xspeed;
+    }
+    if (isCollidingWalls())
+    {
+        yspeed = -yspeed;
     }
 
     glColor3f(1.0, 0.0, 0.0);
@@ -111,6 +150,7 @@ int main(int argc, char **argv)
     glutCreateWindow("Pong");
     init();
     glutDisplayFunc(display);
+    glutKeyboardFunc(checkMov);
     glutReshapeFunc(reshape);
 
     glutMainLoop();
