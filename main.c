@@ -28,7 +28,7 @@ bool isCollidingPalet2()
 }
 bool isCollidingWalls()
 {
-    return (y >= 10 - (pointSize / 100) || y <= -10 + (pointSize / 100));
+    return (y >= 10 - 0.6 || y <= -10 + 0.6);
 }
 bool redScored()
 {
