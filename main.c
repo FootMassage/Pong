@@ -15,6 +15,7 @@ GLint redScore = 0;
 GLint blueScore = 0;
 GLfloat speedPalets = 0.45;
 GLboolean keystates[256];
+
 /*Checkeo de colisiones*/
 bool isCollidingPalet1()
 {
@@ -26,7 +27,7 @@ bool isCollidingPalet2()
 }
 bool isCollidingWalls()
 {
-    return (y == 10 || y == -10);
+    return (y >= 10 - (pointSize / 100) || y <= -10 + (pointSize / 100));
 }
 bool redScored()
 {
@@ -35,6 +36,13 @@ bool redScored()
 bool blueScored()
 {
     return (x >= 10);
+}
+void bounceOnPadle()
+{
+    if (isCollidingPalet1() || isCollidingPalet2())
+    {
+        xspeed = -xspeed;
+    }
 }
 /*Checkeo de goles*/
 void checkGoals()
@@ -61,31 +69,43 @@ void checkMov(unsigned char key, int x, int y)
     {
     case 'W':
     case 'w':
-        rect2v[1] += speedPalets;
-        rect2v2[1] += speedPalets;
-        keystates['w'] = true;
-        keystates['W'] = true;
+        if (rect2v[1] < 10 - speedPalets)
+        {
+            rect2v[1] += speedPalets;
+            rect2v2[1] += speedPalets;
+            keystates['w'] = true;
+            keystates['W'] = true;
+        }
         break;
     case 'S':
     case 's':
-        rect2v[1] -= speedPalets;
-        rect2v2[1] -= speedPalets;
-        keystates['s'] = true;
-        keystates['S'] = true;
+        if (rect2v2[1] > -10 + speedPalets)
+        {
+            rect2v[1] -= speedPalets;
+            rect2v2[1] -= speedPalets;
+            keystates['s'] = true;
+            keystates['S'] = true;
+        }
         break;
     case 'I':
     case 'i':
-        rect1v[1] += speedPalets;
-        rect1v2[1] += speedPalets;
-        keystates['i'] = true;
-        keystates['I'] = true;
+        if (rect1v2[1] < 10 - speedPalets)
+        {
+            rect1v[1] += speedPalets;
+            rect1v2[1] += speedPalets;
+            keystates['i'] = true;
+            keystates['I'] = true;
+        }
         break;
     case 'K':
     case 'k':
-        rect1v[1] -= speedPalets;
-        rect1v2[1] -= speedPalets;
-        keystates['k'] = true;
-        keystates['K'] = true;
+        if (rect1v[1] > -10 + speedPalets)
+        {
+            rect1v[1] -= speedPalets;
+            rect1v2[1] -= speedPalets;
+            keystates['k'] = true;
+            keystates['K'] = true;
+        }
     default:
         break;
     }
@@ -93,6 +113,7 @@ void checkMov(unsigned char key, int x, int y)
 
 void display()
 {
+
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
     checkGoals();
@@ -108,10 +129,7 @@ void display()
 
     x += xspeed;
     y += yspeed / 2;
-    if (isCollidingPalet1() || isCollidingPalet2())
-    {
-        xspeed = -xspeed;
-    }
+    bounceOnPadle();
     if (isCollidingWalls())
     {
         yspeed = -yspeed;
