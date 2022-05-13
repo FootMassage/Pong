@@ -79,51 +79,98 @@ void checkGoals()
     }
 }
 /*Movimiento de las paletas*/
-void checkMov(unsigned char key, int x, int y)
+void checkMovDOWN(unsigned char key, int x, int y)
 {
     switch (key)
     {
     case 'W':
     case 'w':
-        if (rect2v[1] < 10 - speedPalets)
-        {
-            rect2v[1] += speedPalets;
-            rect2v2[1] += speedPalets;
-            keystates['w'] = true;
-            keystates['W'] = true;
-        }
+
+        keystates['w'] = true;
+        keystates['W'] = true;
+
         break;
     case 'S':
     case 's':
-        if (rect2v2[1] > -10 + speedPalets)
-        {
-            rect2v[1] -= speedPalets;
-            rect2v2[1] -= speedPalets;
-            keystates['s'] = true;
-            keystates['S'] = true;
-        }
+
+        keystates['s'] = true;
+        keystates['S'] = true;
+
         break;
     case 'I':
     case 'i':
-        if (rect1v2[1] < 10 - speedPalets)
-        {
-            rect1v[1] += speedPalets;
-            rect1v2[1] += speedPalets;
-            keystates['i'] = true;
-            keystates['I'] = true;
-        }
+
+        keystates['i'] = true;
+        keystates['I'] = true;
+
         break;
     case 'K':
     case 'k':
-        if (rect1v[1] > -10 + speedPalets)
-        {
-            rect1v[1] -= speedPalets;
-            rect1v2[1] -= speedPalets;
-            keystates['k'] = true;
-            keystates['K'] = true;
-        }
+
+        keystates['k'] = true;
+        keystates['K'] = true;
+
     default:
         break;
+    }
+}
+void checkMovUP(unsigned char key, int x, int y)
+{
+    switch (key)
+    {
+    case 'W':
+    case 'w':
+
+        keystates['w'] = false;
+        keystates['W'] = false;
+
+        break;
+    case 'S':
+    case 's':
+
+        keystates['s'] = false;
+        keystates['S'] = false;
+
+        break;
+    case 'I':
+    case 'i':
+
+        keystates['i'] = false;
+        keystates['I'] = false;
+
+        break;
+    case 'K':
+    case 'k':
+
+        keystates['k'] = false;
+        keystates['K'] = false;
+
+    default:
+        break;
+    }
+}
+
+void paddleMove()
+{
+    if ((keystates['w'] || keystates['W']) && rect2v[1] < 10 - speedPalets)
+    {
+        rect2v[1] += speedPalets;
+        rect2v2[1] += speedPalets;
+    }
+    if ((keystates['i'] || keystates['I']) && rect1v2[1] < 10 - speedPalets)
+    {
+        rect1v[1] += speedPalets;
+        rect1v2[1] += speedPalets;
+    }
+    if ((keystates['s'] || keystates['S']) && rect2v2[1] > -10 + speedPalets)
+    {
+        rect2v[1] -= speedPalets;
+        rect2v2[1] -= speedPalets;
+    }
+    if ((keystates['k'] || keystates['K']) && rect1v[1] > -10 + speedPalets)
+    {
+        rect1v[1] -= speedPalets;
+        rect1v2[1] -= speedPalets;
     }
 }
 
@@ -146,6 +193,7 @@ void display()
     x += xspeed;
     y += yspeed / 2;
 
+    paddleMove();
     bounceOnPadle();
 
     if (isCollidingWalls())
@@ -191,7 +239,8 @@ int main(int argc, char **argv)
     init();
 
     glutDisplayFunc(display);
-    glutKeyboardFunc(checkMov);
+    glutKeyboardFunc(checkMovDOWN);
+    glutKeyboardUpFunc(checkMovUP);
     glutReshapeFunc(reshape);
 
     glutMainLoop();
