@@ -10,7 +10,7 @@ GLfloat x = 0, y = 0;
 GLfloat rect1v[] = {9, -2}, rect1v2[] = {9.5, 2}, rect2v[] = {-9, 2}, rect2v2[] = {-9.5, -2};
 GLfloat xspeed = 0.125;
 GLfloat yspeed = 0.125;
-GLfloat pointSize = 30.0;
+GLfloat pointSize = 15.0;
 GLint redScore = 0;
 GLint blueScore = 0;
 GLfloat speedPalets = 0.45;
@@ -18,7 +18,8 @@ GLboolean keystates[256];
 GLboolean collideAlready = 0;
 char strBlue[3] = "0";
 char strRed[3] = "0";
-
+GLboolean isRedMoving = 0,
+          isBlueMoving = 0;
 /*Checkeo de colisiones*/
 bool isCollidingPalet1()
 {
@@ -42,16 +43,34 @@ bool blueScored()
 }
 void bounceOnPadle()
 {
+
     if (!collideAlready && isCollidingPalet1())
     {
         collideAlready = 1;
-        xspeed *= -1.1;
+        if (y > ((rect1v[1] + rect1v2[1]) / 2) && yspeed < 0)
+        {
+            yspeed *= -1;
+        }
+        if (y < ((rect1v[1] + rect1v2[1]) / 2) && yspeed > 0)
+        {
+            yspeed *= -1;
+        }
+        xspeed *= -1.03;
     }
     if (collideAlready && isCollidingPalet2())
     {
         collideAlready = 0;
-        xspeed *= -1.1;
+        if (y > ((rect2v[1] + rect2v2[1]) / 2) && yspeed < 0)
+        {
+            yspeed *= -1;
+        }
+        if (y < ((rect2v[1] + rect2v2[1]) / 2) && yspeed > 0)
+        {
+            yspeed *= -1;
+        }
+        xspeed *= -1.03;
     }
+    // printf("xspeed= %f\n", xspeed);
 }
 
 /*Checkeo de goles*/
@@ -85,28 +104,28 @@ void checkMovDOWN(unsigned char key, int x, int y)
     {
     case 'W':
     case 'w':
-
+        isBlueMoving = true;
         keystates['w'] = true;
         keystates['W'] = true;
 
         break;
     case 'S':
     case 's':
-
+        isBlueMoving = true;
         keystates['s'] = true;
         keystates['S'] = true;
 
         break;
     case 'I':
     case 'i':
-
+        isRedMoving = true;
         keystates['i'] = true;
         keystates['I'] = true;
 
         break;
     case 'K':
     case 'k':
-
+        isRedMoving = true;
         keystates['k'] = true;
         keystates['K'] = true;
 
@@ -120,28 +139,28 @@ void checkMovUP(unsigned char key, int x, int y)
     {
     case 'W':
     case 'w':
-
+        isBlueMoving = false;
         keystates['w'] = false;
         keystates['W'] = false;
 
         break;
     case 'S':
     case 's':
-
+        isBlueMoving = false;
         keystates['s'] = false;
         keystates['S'] = false;
 
         break;
     case 'I':
     case 'i':
-
+        isRedMoving = false;
         keystates['i'] = false;
         keystates['I'] = false;
 
         break;
     case 'K':
     case 'k':
-
+        isRedMoving = false;
         keystates['k'] = false;
         keystates['K'] = false;
 
@@ -193,9 +212,6 @@ void display()
     x += xspeed;
     y += yspeed / 2;
 
-    paddleMove();
-    bounceOnPadle();
-
     if (isCollidingWalls())
     {
         yspeed = -yspeed;
@@ -209,6 +225,10 @@ void display()
     glRectfv(rect2v, rect2v2);
     glRasterPos2d(-5, 0);
     glutBitmapString(GLUT_BITMAP_9_BY_15, strBlue);
+
+    paddleMove();
+    bounceOnPadle();
+
     glutSwapBuffers();
     glutPostRedisplay();
 }
